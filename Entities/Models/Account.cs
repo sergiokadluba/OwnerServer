@@ -7,6 +7,7 @@ namespace Entities.Models
     [Table("account")]
     public class Account
     {
+        [Column("AccountId")]
         public Guid AccountId { get; set; }
 
         [Required(ErrorMessage = "Date created is required")]

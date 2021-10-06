@@ -32,6 +32,7 @@ namespace AccountOwnerServer
             services.ConfigureIISIntegration();
             services.ConfigureMySqlContext(Configuration);
             services.ConfigureRepositoryWrapper();
+            services.AddAutoMapper(typeof(Startup));
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
