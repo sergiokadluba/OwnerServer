@@ -8,6 +8,7 @@ namespace Entities.Models
     [Table("owner")]
     public class Owner
     {
+        [Column("OwnerId")]
         public Guid OwnerId { get; set; }
 
         [Required(ErrorMessage = "Name is required")]
