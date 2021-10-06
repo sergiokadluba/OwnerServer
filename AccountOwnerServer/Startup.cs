@@ -30,7 +30,8 @@ namespace AccountOwnerServer
         {
             services.ConfigureCors();
             services.ConfigureIISIntegration();
-
+            services.ConfigureMySqlContext(Configuration);
+            services.ConfigureRepositoryWrapper();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
