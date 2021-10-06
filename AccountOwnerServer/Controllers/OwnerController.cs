@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
+using Entities.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AccountOwnerServer.Controllers
 {
@@ -32,7 +34,7 @@ namespace AccountOwnerServer.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "OwnerById")]
         public IActionResult GetOwnerById(Guid id)
         {
             try
@@ -70,6 +72,93 @@ namespace AccountOwnerServer.Controllers
                     var ownerResult = _mapper.Map<OwnerDto>(owner);
                     return Ok(ownerResult);
                 }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult CreateOwner([FromBody] OwnerForCreationDto owner)
+        {
+            try
+            {
+                if (owner == null)
+                {
+                    return BadRequest("Owner object is null");
+                }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Invalid model object");
+                }
+                var ownerEntity = _mapper.Map<Owner>(owner);
+                _repository.Owner.CreateOwner(ownerEntity);
+                _repository.Save();
+
+                var createdOwner = _mapper.Map<OwnerDto>(ownerEntity);
+
+                return CreatedAtRoute("OwnerById", new { id = createdOwner.OwnerId }, createdOwner);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateOwner(Guid id, [FromBody] OwnerForUpdateDto owner)
+        {
+            try
+            {
+                if (owner == null)
+                {
+                    return BadRequest("Owner object is null");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Invalid model object");
+                }
+
+                var ownerEntity = _repository.Owner.GetOwnerById(id);
+                if (ownerEntity == null)
+                {
+                    return NotFound();
+                }
+
+                _mapper.Map(owner, ownerEntity);
+
+                _repository.Owner.UpdateOwner(ownerEntity);
+                _repository.Save();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
+        [HttpDelete("{id}")]
+        public IActionResult DeleteOwner(Guid id)
+        {
+            try
+            {
+                var owner = _repository.Owner.GetOwnerById(id);
+                if (owner == null)
+                {
+                    return NotFound();
+                }
+
+                if (_repository.Account.AccountsByOwner(id).Any())
+                {
+                    return BadRequest("Cannot delete owner. It has related accounts. Delete those accounts first");
+                }
+
+                _repository.Owner.DeleteOwner(owner);
+                _repository.Save();
+
+                return NoContent();
             }
             catch (Exception ex)
             {
