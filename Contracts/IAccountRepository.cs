@@ -1,8 +1,11 @@
 ﻿using Entities.Models;
+using System;
+using System.Collections.Generic;
 
 namespace Contracts
 {
-    public interface IAccountRepository : IRepositoryBase<Account>
+    public interface IAccountRepository
     {
+        IEnumerable<Account> AccountsByOwner(Guid ownerId);
     }
 }
