@@ -1,5 +1,6 @@
 ﻿using Contracts;
 using Entities;
+using Entities.Helpers;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -25,16 +26,17 @@ namespace Repository
             Delete(owner);
         }
 
-        public IEnumerable<Owner> GetAllOwners()
-        {
-            return FindAll()
-                .OrderBy(ow => ow.Name)
-                .ToList();
-        }
         public Owner GetOwnerById(Guid ownerId)
         {
             return FindByCondition(owner => owner.OwnerId.Equals(ownerId))
                     .FirstOrDefault();
+        }
+
+        public PagedList<Owner> GetOwners(OwnerParameters ownerParameters)
+        {
+            return PagedList<Owner>.ToPagedList(FindAll().OrderBy(on => on.Name),
+                ownerParameters.PageNumber,
+                ownerParameters.PageSize);
         }
 
         public Owner GetOwnerWithDetails(Guid ownerId)
