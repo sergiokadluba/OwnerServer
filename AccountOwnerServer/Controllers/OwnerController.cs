@@ -24,6 +24,10 @@ namespace AccountOwnerServer.Controllers
         [HttpGet]
         public IActionResult GetOwners([FromQuery] OwnerParameters ownerParameters)
         {
+            if (!ownerParameters.ValidYearRange)
+            {
+                return BadRequest("Max year of birth cannot be less than min year of birth");
+            }
             try
             {
                 var owners = _repository.Owner.GetOwners(ownerParameters);
