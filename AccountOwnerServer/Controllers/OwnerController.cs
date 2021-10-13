@@ -36,6 +36,7 @@ namespace AccountOwnerServer.Controllers
                     owners.HasNext,
                     owners.HasPrevious
                 };
+
                 Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
 
                 var ownersResult = _mapper.Map<IEnumerable<OwnerDto>>(owners);
