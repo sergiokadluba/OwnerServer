@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace AccountOwnerServer.Controllers
 {
@@ -21,11 +22,22 @@ namespace AccountOwnerServer.Controllers
             _mapper = mapper;
         }
         [HttpGet]
-        public IActionResult GetAllOwners()
+        public IActionResult GetOwners([FromQuery] OwnerParameters ownerParameters)
         {
             try
             {
-                var owners = _repository.Owner.GetAllOwners();
+                var owners = _repository.Owner.GetOwners(ownerParameters);
+                var metadata = new
+                {
+                    owners.TotalCount,
+                    owners.PageSize,
+                    owners.CurrentPage,
+                    owners.TotalPages,
+                    owners.HasNext,
+                    owners.HasPrevious
+                };
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+
                 var ownersResult = _mapper.Map<IEnumerable<OwnerDto>>(owners);
                 return Ok(ownersResult);
             }
@@ -33,6 +45,7 @@ namespace AccountOwnerServer.Controllers
             {
                 return StatusCode(500, "Internal server error");
             }
+           
         }
         [HttpGet("{id}", Name = "OwnerById")]
         public IActionResult GetOwnerById(Guid id)
