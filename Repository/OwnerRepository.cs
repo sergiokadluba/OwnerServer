@@ -6,14 +6,20 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Text;
+
 
 namespace Repository
 {
+    
     public class OwnerRepository : RepositoryBase<Owner>, IOwnerRepository
     {
-        public OwnerRepository(RepositoryContext repositoryContext)
+        private ISortHelper<Owner> _sortHelper;
+        public OwnerRepository(RepositoryContext repositoryContext, ISortHelper<Owner> sortHelper)
             : base(repositoryContext)
         {
+            _sortHelper = sortHelper;
         }
 
         public void CreateOwner(Owner owner)
@@ -38,9 +44,7 @@ namespace Repository
                                         o.DateOfBirth.Year <= ownerParameters.MaxYearOfBirth);
 
             SearchByName(ref owners, ownerParameters.Name);
-
-            owners = owners.OrderBy(on => on.Name);
-
+            
             return PagedList<Owner>.ToPagedList(owners.OrderBy(on => on.Name),
                 ownerParameters.PageNumber,
                 ownerParameters.PageSize);
@@ -53,6 +57,8 @@ namespace Repository
 
             owners = owners.Where(o => o.Name.ToLower().Contains(ownerName.Trim().ToLower()));
         }
+
+       
 
         public Owner GetOwnerWithDetails(Guid ownerId)
         {
