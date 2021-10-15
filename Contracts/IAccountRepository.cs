@@ -1,11 +1,12 @@
-﻿using Entities.Models;
+﻿using Entities.Helpers;
+using Entities.Models;
 using System;
-using System.Collections.Generic;
 
 namespace Contracts
 {
-    public interface IAccountRepository
-    {
-        IEnumerable<Account> AccountsByOwner(Guid ownerId);
-    }
+	public interface IAccountRepository : IRepositoryBase<Account>
+	{
+		PagedList<Account> GetAccountsByOwner(Guid ownerId, AccountParameters parameters);
+		Account GetAccountByOwner(Guid ownerId, Guid id);
+	}
 }
